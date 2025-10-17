@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Entity
 @Data
+@Entity(name = "User")
 @Table(name = "app_user")
 public class User {
     @Id
@@ -13,6 +13,7 @@ public class User {
     private Long id;
 
     @NotNull
+    @Column(unique = true, nullable = false)
     private String username;
     @NotNull
     private String password;
@@ -20,4 +21,7 @@ public class User {
     private String role;
     @NotNull
     private String email;
+    @NotNull
+    @Column(unique = true, nullable = false)
+    private String encryptedPassword;
 }
