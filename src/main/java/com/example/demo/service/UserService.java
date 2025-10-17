@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<UserDto> getAllUsers();
     String addUser(UserCreateDto userCreateDto);
     boolean verifyUser(UserLoginDto userLoginDto);
+    boolean ifUserExists(UserCreateDto userCreateDto);
 }
