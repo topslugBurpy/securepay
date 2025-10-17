@@ -3,12 +3,14 @@ package com.example.demo.service;
 import com.example.demo.entity.User;
 import com.example.demo.model.UserCreateDto;
 import com.example.demo.model.UserDto;
+import com.example.demo.model.UserLoginDto;
 import com.example.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final AuthService authService;
 
 
     @Override
@@ -25,36 +28,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addUser(UserCreateDto userCreateDto) {
-        //if email address
         try {
+
             String encryptedPassword = null;
+
+            //if encryptedPassword
+            //TODO remove encryptedPassword check as the dto already has a check
             if(userCreateDto.password()!=null && userCreateDto.password()!="") {
-                encryptedPassword = generatePassword(userCreateDto.password());
+                encryptedPassword = authService.generatePassword(userCreateDto.password());
             }
+
             User newUser = new User();
 
             newUser.setEmail(userCreateDto.email());
-            newUser.setPassword(encryptedPassword);
+            newUser.setPassword(userCreateDto.password());
             newUser.setUsername(userCreateDto.username());
             newUser.setRole(userCreateDto.role());
 
+            //set the encrypted encryptedPassword for login
+            newUser.setEncryptedPassword(encryptedPassword);
+
             userRepository.save(newUser);
-            return "User added successfully";
+            return "User added successfully!";
+
         } catch (Exception e) {
             return e.getMessage();
         }
-
     }
 
+    @Override
+    public boolean verifyUser(UserLoginDto userLoginDto){
+        return authService.isGenuineUser(userLoginDto);
+    }
 
-    //HELPER FUNCTIONS
+   //HELPER FUNCTIONS
 
     private UserDto convertToUserDto(User user) {
         return new UserDto(user.getId(), user.getUsername(), user.getRole(), user.getEmail(),  user.getPassword());
     }
 
-    private String generatePassword(String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode(password);
-    }
 }
