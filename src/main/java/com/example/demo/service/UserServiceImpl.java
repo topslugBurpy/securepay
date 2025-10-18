@@ -59,11 +59,11 @@ public class UserServiceImpl implements UserService {
     public boolean ifUserExists(UserCreateDto userCreateDto) {
         if(userCreateDto.username()!=null && !userCreateDto.username().isBlank() &&
                 userRepository.existsByUsername(userCreateDto.username())) {
-             throw new ConflictException("Username is already taken");
+             throw new ConflictException("Username is already taken!");
         }
         if(userCreateDto.email()!=null && !userCreateDto.email().isBlank() &&
                 userRepository.existsByEmail(userCreateDto.email())) {
-            throw new ConflictException("Email is already taken");
+            throw new ConflictException("Email is already taken!");
         }
         return false;
     }
