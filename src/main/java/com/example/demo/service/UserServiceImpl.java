@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.User;
+import com.example.demo.exception.ConflictException;
 import com.example.demo.model.UserCreateDto;
 import com.example.demo.model.UserDto;
 import com.example.demo.model.UserLoginDto;
@@ -22,14 +23,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(this::convertToUserDto).collect(Collectors.toList());
-    }
-
-    @Override
     public String addUser(UserCreateDto userCreateDto) {
         try {
-
             String encryptedPassword = null;
 
             //if encryptedPassword
@@ -41,7 +36,6 @@ public class UserServiceImpl implements UserService {
             User newUser = new User();
 
             newUser.setEmail(userCreateDto.email());
-            newUser.setPassword(userCreateDto.password());
             newUser.setUsername(userCreateDto.username());
             newUser.setRole(userCreateDto.role());
 
@@ -61,10 +55,17 @@ public class UserServiceImpl implements UserService {
         return authService.isGenuineUser(userLoginDto);
     }
 
-   //HELPER FUNCTIONS
-
-    private UserDto convertToUserDto(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getRole(), user.getEmail(),  user.getPassword());
+    @Override
+    public boolean ifUserExists(UserCreateDto userCreateDto) {
+        if(userCreateDto.username()!=null && !userCreateDto.username().isBlank() &&
+                userRepository.existsByUsername(userCreateDto.username())) {
+             throw new ConflictException("Username is already taken!");
+        }
+        if(userCreateDto.email()!=null && !userCreateDto.email().isBlank() &&
+                userRepository.existsByEmail(userCreateDto.email())) {
+            throw new ConflictException("Email is already taken!");
+        }
+        return false;
     }
 
 }

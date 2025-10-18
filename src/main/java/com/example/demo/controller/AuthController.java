@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.model.UserCreateDto;
 import com.example.demo.model.UserLoginDto;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserCreateDto UserCreateDto) {
-        var res = userService.addUser(UserCreateDto);
+    public ResponseEntity<String> registerUser(@RequestBody UserCreateDto userCreateDto) {
+        userService.ifUserExists(userCreateDto);
+        var res = userService.addUser(userCreateDto);
         return ResponseEntity.ok(res);
     }
 
