@@ -3,19 +3,15 @@ package com.example.demo.service;
 import com.example.demo.entity.User;
 import com.example.demo.exception.ConflictException;
 import com.example.demo.model.UserCreateDto;
-import com.example.demo.model.UserDto;
 import com.example.demo.model.UserLoginDto;
 import com.example.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -29,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
             //if encryptedPassword
             //TODO remove encryptedPassword check as the dto already has a check
-            if(userCreateDto.password()!=null && userCreateDto.password()!="") {
+            if(userCreateDto.password()!=null && !userCreateDto.password().isEmpty()) {
                 encryptedPassword = authService.generatePassword(userCreateDto.password());
             }
 
@@ -44,7 +40,6 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(newUser);
             return "User added successfully!";
-
         } catch (Exception e) {
             return e.getMessage();
         }
